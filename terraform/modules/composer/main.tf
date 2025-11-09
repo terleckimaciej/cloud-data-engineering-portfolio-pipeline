@@ -31,11 +31,3 @@ resource "google_composer_environment" "env" {
   }
 }
 
-
-# Upload DAG to Composer bucket
-resource "google_storage_bucket_object" "dag_pipeline" {
-  name   = "dags/${basename(var.dag_source_path)}"
-  bucket = var.composer_bucket_name
-  source = var.dag_source_path
-  depends_on = [google_composer_environment.env]
-}
