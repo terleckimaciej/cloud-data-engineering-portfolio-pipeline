@@ -60,9 +60,11 @@ composer_sa = var.composer_sa
 
 
 module "composer" {
-source = "./modules/composer"
-project_id = var.project_id
-data_lake_bucket_name = var.data_lake_bucket_name
+  source                = "./modules/composer"
+  project_id            = var.project_id
+  data_lake_bucket_name = var.data_lake_bucket_name
+  composer_bucket_name  = var.composer_bucket_name
+  dag_source_path       = var.dag_source_path
 }
 
 
