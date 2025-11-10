@@ -20,7 +20,7 @@ for flag in ["--no-sandbox", "--disable-dev-shm-usage"]:
         pyppeteer.launcher.DEFAULT_ARGS.remove(flag)
 
 
-# --- KONFIG ---
+# --- CONFIG ---
 INPUT_PATH  = f"gs://pracuj-pl-data-lake/raw/job_listings_{date.today()}.parquet"
 OUTPUT_PATH = f"gs://pracuj-pl-data-lake/enriched/job_details_enriched_{date.today()}.parquet"
 
@@ -30,10 +30,10 @@ FINAL_TABLE = f"{PROJECT_ID}.{DATASET_ID}.curated_jobs"
 
 MAX_OFFERS = 20000
 CONCURRENCY = 2
-LOOKBACK_DAYS = 45  # tylko ostatnie 45 dni ogłoszeń z BQ
+LOOKBACK_DAYS = 45  # just last 45 days from listings in BQ DW
 
 
-# === FUNKCJE POMOCNICZE ===
+# === Fuctions ===
 
 def first_text(soup: BeautifulSoup, selectors: list[str]) -> str | None:
     for css in selectors:
@@ -133,7 +133,7 @@ def extract_technologies(soup: BeautifulSoup):
     return (req or None, opt or None)
 
 
-# === GŁÓWNY PARSER ===
+# === MAIN PARSER ===
 
 def parse_detail_html(html: str) -> dict:
     soup = BeautifulSoup(html, "html.parser")
@@ -187,7 +187,7 @@ async def fetch_one(asession, url, date_added, idx: int, total: int):
     try:
         r = await asession.get(url)
 
-        # retry 3x w przypadku błędu renderowania
+        # retry 3x in case of render error
         for attempt in range(3):
             try:
                 await r.html.arender(timeout=40, sleep=random.uniform(2, 4))
@@ -201,23 +201,23 @@ async def fetch_one(asession, url, date_added, idx: int, total: int):
         data["date_added_raw"] = date_added
         data["offer_id"] = extract_offer_id(url)
 
-        # 💬 Nowe logowanie postępu
+        # 💬 logging of progress
         print(f"[{idx}/{total}] ✅ OK: {url}")
 
         return data
 
     except Exception as e:
-        print(f"[{idx}/{total}] ⚠️ Błąd dla {url}: {e}")
+        print(f"[{idx}/{total}] ⚠️ Error at {url}: {e}")
         return None
 
 
 async def main():
     fs = gcsfs.GCSFileSystem(token="cloud")
-    print(f"📥 Wczytuję dane wejściowe z {INPUT_PATH} ...")
+    print(f"📥 Reading input data from {INPUT_PATH} ...")
     with fs.open(INPUT_PATH, "rb") as f:
         df_in = pd.read_parquet(f)
 
-    print(f"🔗 Przetwarzam {len(df_in)} ofert (surowych).")
+    print(f"🔗 Processing {len(df_in)} offers (raw)")
 
     df_in["offer_id"] = df_in["url"].apply(extract_offer_id)
 
@@ -240,9 +240,9 @@ async def main():
     )
     df_new = df_new[~df_new["offer_id"].isin(existing_ids)]
 
-    print(f"🆕 Nowych ofert do scrapowania: {len(df_new)}")
+    print(f"🆕 New offers to scrape: {len(df_new)}")
     if df_new.empty:
-        print("✅ Brak nowych ofert — kończę proces.")
+        print("✅ No new offers found - killing the process.")
         return pd.DataFrame()
 
     df_iter = df_new.head(MAX_OFFERS)
@@ -257,7 +257,7 @@ async def main():
             if res:
                 results.append(res)
 
-    # 💬 enumerate dodaje indeksy (0,1,2,...)
+    # 💬 enumerate adds indexes (0,1,2,...)
     await asyncio.gather(*[limited_fetch(idx, row) for idx, row in df_iter.iterrows()])
     await asession.close()
 
@@ -266,7 +266,7 @@ async def main():
 
     with fs.open(OUTPUT_PATH, "wb") as f:
         df_out.to_parquet(f, index=False)
-    print(f"✅ Zapisano wzbogacony plik do: {OUTPUT_PATH}")
+    print(f"✅ Enriched file saved at: {OUTPUT_PATH}")
 
     return df_out
 
