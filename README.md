@@ -78,12 +78,29 @@ The final dashboard built in **Looker Studio** includes:
 ```
 pracuj-pl-pipeline/
 │
-├── dags/                  # Airflow DAG definitions (orchestrating the pipeline)
-├── spark_jobs/            # PySpark transformation jobs for Dataproc
-├── docker/                # Dockerfiles for Cloud Run jobs (scraper & enricher)
-├── scripts/               # Utility Python scripts (load to BQ)
-├── terraform/             # Infrastructure as Code (GCS buckets, Composer, Dataproc, BQ datasets)
-└── README.md              # Project documentation
+├── cloudrun_jobs/          # Cloud Run Jobs (Dockerized) – web scraper & enricher fetching job listings
+│   ├── scraper/            # Extracts job listing URLs from pracuj.pl
+│   └── enricher/           # Visits individual listings and extracts detailed attributes
+│
+├── dags/                   # Apache Airflow DAGs – orchestration of the entire pipeline
+│   └── pracuj_pipeline_dag.py
+│
+├── pyspark_jobs/           # PySpark jobs executed on ephemeral Dataproc clusters
+│   └── transform_job.py    # Data cleaning, normalization & feature engineering logic
+│
+├── scripts/                # Utility scripts (e.g. BigQuery loader)
+│   └── load_bq.py          # Loads curated data into partitioned BigQuery tables
+│
+├── terraform/              # Infrastructure as Code (Terraform)
+│   ├── main.tf             # Core GCP resources: GCS, Dataproc, Composer, BigQuery
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── modules/            # Modular definitions for each GCP service
+│
+├── .gitignore              # Git exclusions for logs, data, and local configs
+├── LICENSE                 # Open-source license (MIT)
+├── README.md               # Project documentation (architecture, dataset, usage)
+└── requirements.txt        # Python dependencies for development environment
 ```
 
 ---
