@@ -64,12 +64,8 @@ Final outputs are stored in Parquet format in the GCS Data Lake and loaded into 
 
 ## 📊 Final Result
 
-The final dashboard built in **Looker Studio** includes:
+![Uploading pracuj.pl_pipeline_final_dashboard_page-0001 (1).jpg…]()
 
-* salary ranges by technology and location
-* daily new job postings
-* most frequent job titles and categories
-* ML-based predictions for salary range
 
 ---
 
