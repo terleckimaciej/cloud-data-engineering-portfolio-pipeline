@@ -1,4 +1,4 @@
-# Pracuj.pl Data Pipeline
+# Pracuj.pl Job offers pipeline
 
 A fully orchestrated data engineering pipeline on **Google Cloud Platform** using **Docker, Airflow, Dataproc (Spark), BigQuery, Looker Studio, Vertex AI** and **Terraform**.
 
