@@ -64,7 +64,7 @@ Final outputs are stored in Parquet format in the GCS Data Lake and loaded into 
 
 ## 📊 Final Result
 
-![Uploading pracuj.pl_pipeline_final_dashboard_page-0001 (1).jpg…]()
+<img width="1280" alt="final_dashboard" src="https://github.com/terleckimaciej/cloud-data-engineering-portfolio-pipeline/blob/main/assets/final_dahsboard.jpg" /> 
 
 
 ---
